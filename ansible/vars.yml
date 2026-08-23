@@ -1,0 +1,5 @@
+---
+app_name: nginx
+app_port: 80
+web_root: /var/www/html
+index_page: index.html
