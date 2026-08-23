@@ -4,6 +4,9 @@
   become: yes
   vars_files:
     - vars.yml
+  vars:
+    hostname: "{{ ansible_hostname }}"
+    node_exporter_port: 9100
 
   handlers:
     - name: restart_nginx
@@ -24,18 +27,11 @@
         state: started
         enabled: yes
 
-    - name: Create custom index page
-      copy:
+    - name: Deploy custom index page from template
+      template:
+        src: templates/index.html.j2
         dest: "{{ web_root }}/{{ index_page }}"
-        content: |
-          <html>
-          <head><title>Ansible Deployed</title></head>
-          <body>
-          <h1>This server was provisioned by Ansible!</h1>
-          <p>Hostname: {{ ansible_hostname }}</p>
-          <p>OS: {{ ansible_distribution }} {{ ansible_distribution_version }}</p>
-          <p>Deployed on: {{ ansible_date_time.date }}</p>
-          <p>Port: {{ app_port }}</p>
-          </body>
-          </html>
+        owner: root
+        group: root
+        mode: '0644'
       notify: restart_nginx
