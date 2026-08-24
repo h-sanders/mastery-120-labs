@@ -1,0 +1,3 @@
+---
+grafana_version: "10.4.0"
+grafana_port: 3000

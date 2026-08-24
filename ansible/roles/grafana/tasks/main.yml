@@ -1,0 +1,137 @@
+---
+- name: Create system user for Grafana
+  user:
+    name: grafana
+    system: yes
+    shell: /bin/false
+    create_home: no
+
+- name: Create Grafana directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: grafana
+    group: grafana
+  loop:
+    - /etc/grafana
+    - /var/lib/grafana
+    - /var/log/grafana
+    - /usr/share/grafana
+
+- name: Download Grafana
+  get_url:
+    url: "https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}.linux-arm64.tar.gz"
+    dest: "/tmp/grafana.tar.gz"
+
+- name: Extract Grafana
+  unarchive:
+    src: "/tmp/grafana.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+    creates: "/tmp/grafana-v{{ grafana_version }}/bin/grafana"
+
+- name: Install Grafana binary
+  copy:
+    src: "/tmp/grafana-v{{ grafana_version }}/bin/grafana"
+    dest: "/usr/local/bin/grafana"
+    mode: "0755"
+    remote_src: yes
+
+- name: Copy Grafana web files
+  copy:
+    src: "/tmp/grafana-v{{ grafana_version }}/"
+    dest: "/usr/share/grafana/"
+    remote_src: yes
+    owner: grafana
+    group: grafana
+
+- name: Create Grafana systemd service
+  copy:
+    dest: /etc/systemd/system/grafana.service
+    content: |
+      [Unit]
+      Description=Grafana
+      After=network.target
+
+      [Service]
+      User=grafana
+      ExecStart=/usr/local/bin/grafana server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Start and enable Grafana
+  systemd:
+    name: grafana
+    state: started
+    enabled: yes
+    daemon_reload: yes
+- name: Create system user for Grafana
+  user:
+    name: grafana
+    system: yes
+    shell: /bin/false
+    create_home: no
+
+- name: Create Grafana directories
+  file:
+    path: "{{ item }}"
+    state: directory
+    owner: grafana
+    group: grafana
+  loop:
+    - /etc/grafana
+    - /var/lib/grafana
+    - /var/log/grafana
+    - /usr/share/grafana
+
+- name: Download Grafana
+  get_url:
+    url: "https://dl.grafana.com/oss/release/grafana-{{ grafana_version }}.linux-arm64.tar.gz"
+    dest: "/tmp/grafana.tar.gz"
+
+- name: Extract Grafana
+  unarchive:
+    src: "/tmp/grafana.tar.gz"
+    dest: "/tmp/"
+    remote_src: yes
+    creates: "/tmp/grafana-v{{ grafana_version }}/bin/grafana"
+
+- name: Install Grafana binary
+  copy:
+    src: "/tmp/grafana-v{{ grafana_version }}/bin/grafana"
+    dest: "/usr/local/bin/grafana"
+    mode: "0755"
+    remote_src: yes
+
+- name: Copy Grafana web files
+  copy:
+    src: "/tmp/grafana-v{{ grafana_version }}/"
+    dest: "/usr/share/grafana/"
+    remote_src: yes
+    owner: grafana
+    group: grafana
+
+- name: Create Grafana systemd service
+  copy:
+    dest: /etc/systemd/system/grafana.service
+    content: |
+      [Unit]
+      Description=Grafana
+      After=network.target
+
+      [Service]
+      User=grafana
+      ExecStart=/usr/local/bin/grafana server --homepath=/usr/share/grafana --config=/etc/grafana/grafana.ini
+      Restart=always
+
+      [Install]
+      WantedBy=multi-user.target
+
+- name: Start and enable Grafana
+  systemd:
+    name: grafana
+    state: started
+    enabled: yes
+    daemon_reload: yes

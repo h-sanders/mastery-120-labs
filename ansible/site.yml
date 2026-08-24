@@ -1,0 +1,8 @@
+---
+- name: Deploy full monitoring stack
+  hosts: localhost
+  become: yes
+  roles:
+    - node_exporter
+    - prometheus
+    - grafana
